@@ -1,43 +1,42 @@
 # Project Plan
 
 ## Title
-Linking Writing Processes to Writing Quality
+Climate Change Analysis in Top US States 
 
 ## Main Question
 
-Is there is a relationship between writing behaviour and the final grade of an essay?
+Relationship between the population of an area and the effect of climate change in USA States
 
 ## Description
 
+we have the summer, spring and fall temperture from year 2010-2019 and the population for these years as well. we will find the Relationship of the increase in population and the change in temperture due to the population and their waste to prove the corelation that increase in population results to increase in temperture and climate change. 
 
-In this project, following problems will be addressed by using Machine Learning techniques:
-
-Writing being a complex process involves various behaviors and brain activities like planning, revising, taking a break, and managing to write it before the deadline/time finishes. Our traditional wiring assessments only focus on the final product ignoring all the steps and brain thinking behind it. Previous research in this area was also limited due to low dataset.
-
-We will use Machine Learning techniques by analyzing the keystroke log data provided as a dataset to uncover the key aspects of the writing process while aiming to establish relationships between a writer's behaviors during the writing process and the overall quality of their writing.  
-
-This approach may also encourage the learners to pay more attention to how they write and how they can enhance their skills further in writing.
 
 
 ## Datasources
 
-
-### Datasource1: Train Logs
-* Metadata URL: https://www.kaggle.com/competitions/linking-writing-processes-to-writing-quality/data
-* Data URL: https://www.kaggle.com/competitions/linking-writing-processes-to-writing-quality/data
+### Datasource #1: State Population Totals and Components of Change: 2020-2022
+* Metadata URL: https://www.census.gov/data/tables/time-series/demo/popest/2010s-state-total.html
+* Data URL: https://www2.census.gov/programs-surveys/popest/tables/2010-2019/state/totals/nst-est2019-01.xlsx
 * Data Type: CSV
 
-dataset comprises about 5000 logs of user inputs, such as keystrokes and mouse clicks, taken during the composition of an essay. Each essay was scored on a scale of 0 to 6. Your goal is to predict the score an essay received from its log of user inputs.
+This dataset contains state population totals and components of change for years 2010 to 2019.  
 
-### Datasource2: 
-##  *Emailed the owner for using it as an opensource*
+### Datasource #2: Climate change in the contiguous United States
+
+* Metadata URL: https://github.com/washingtonpost/data-2C-beyond-the-limit-usa/tree/main
+* Data URL: https://github.com/washingtonpost/data-2C-beyond-the-limit-usa/tree/main
+* Data Type: CSV
+
+these data files that are the product of analysis of climate change in the contiguous United States from 1895-2019.
 
 ## Work Packages
 
+<!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
 
-1. Data Collection and Data Understanding [#1][i1]
-2. Feature Engineering and ETL/EDA
-3. Data Analysis and Data Insight
-4. Documentation and Results
+1. Data Collection and Understanding [#1][i1]
+2. Data Engineering
+3. Data Modeling
+4. Analysis
 
 [i1]: https://github.com/jvalue/made-template/issues/1
