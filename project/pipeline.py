@@ -1,44 +1,71 @@
 import opendatasets as od
-import requests
 import os
-import sqlite3
 import pandas as pd
+import requests
+from sqlalchemy import create_engine
 
-class Pipeline:        
-    def creating_SQL(self):
-        dataset = 'https://www2.census.gov/programs-surveys/popest/tables/2010-2019/state/totals/nst-est2019-01.xlsx'
-        od.download(dataset)
-        file_path = 'nst-est2019-01.xlsx'
-        state_pop_df = pd.read_excel(file_path)
-        state_pop_df.columns
-        new_column_names = {'table with row headers in column A and column headers in rows 3 through 4. (leading dots indicate sub-parts)': 'State_Name','Unnamed: 12': 'Population_Estimate_2019'}
-        state_pop_df = state_pop_df.rename(columns=new_column_names)
-        state_pop_df=state_pop_df.drop(columns=['Unnamed: 1','Unnamed: 2','Unnamed: 3','Unnamed: 4','Unnamed: 5','Unnamed: 6','Unnamed: 7','Unnamed: 8','Unnamed: 9','Unnamed: 10','Unnamed: 11'])
-        state_pop_df = state_pop_df.iloc[3:61]
-        state_pop_df = state_pop_df.reset_index(drop=True)
-        github_url = 'https://raw.githubusercontent.com/washingtonpost/data-2C-beyond-the-limit-usa/main/data/raw/co-est2018-alldata.csv'
-        response = requests.get(github_url)
-        if response.status_code == 200:
-            with open('co-est2018-alldata.csv', 'wb') as file:
-                file.write(response.content)
-            Climate_USA_df = pd.read_csv('co-est2018-alldata.csv', encoding='latin1')  # Assuming 'latin1' encoding, you can try 'ISO-8859-1' as well
-        else:
-            print(f"Failed to download the file. Status code: {response.status_code}")
-        current_dir = os.getcwd()
-        data_dir = os.path.join(os.path.dirname(current_dir), 'data')
-        os.makedirs(data_dir, exist_ok=True)
-        db_path = os.path.join(data_dir, 'state_population.sqlite')
-        db_path = os.path.join(data_dir, 'Climate_USA.sqlite')  
-        conn = sqlite3.connect(db_path)
-        state_pop_df.to_sql('state_population', conn, index=False, if_exists='replace')
-        Climate_USA_df.to_sql('Climate_USA', conn, index=False, if_exists='replace')
-        conn.close()
-        
-        
-            
+def download_csv(url, save_path):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(save_path, 'wb') as file:
+            file.write(response.content)
+        print(f"CSV file downloaded successfully to {save_path}")
+    else:
+        print(f"Failed to download CSV file. Status code: {response.status_code}")
+
+
+def st_climate():
+    github_url = 'https://raw.githubusercontent.com/washingtonpost/data-2C-beyond-the-limit-usa/main/data/processed/model_state.csv'
+    model_state_file = 'model_state.csv'
+    download_csv(github_url, model_state_file)
+
+    model_state = pd.read_csv('model_state.csv')
+    model_state = model_state[['fips','STATE_NAME']]
+
+    github_url = 'https://raw.githubusercontent.com/washingtonpost/data-2C-beyond-the-limit-usa/main/data/processed/climdiv_state_year.csv'
+    climdiv_state_year_file = 'climdiv_state_year.csv'
+    download_csv(github_url, climdiv_state_year_file)
+
+    state_climate = pd.read_csv('climdiv_state_year.csv')
+    state_climate = state_climate[(state_climate['year'] >= 2010) & (state_climate['year'] <= 2019)].reset_index(drop=True)
+    state_climate = state_climate.drop(state_climate.columns[2], axis=1)
+    state_climate = pd.merge(state_climate, model_state, on='fips', how='left')
+    state_climate = state_climate.drop(state_climate.columns[0], axis=1)
+    state_climate = state_climate[['STATE_NAME','year','tempc']]
+    state_climate = state_climate.rename(columns={'STATE_NAME': 'State','tempc':'Temperature in Celsius'})
+    state_climate = state_climate.pivot(index='State', columns='year', values='Temperature in Celsius').reset_index()
+    state_climate.index.name = None
+
+    return state_climate
+
+def st_pop(state_climate):
+    dataset = 'https://www2.census.gov/programs-surveys/popest/tables/2010-2019/state/totals/nst-est2019-01.xlsx'
+    od.download(dataset)
+
+    file_path = 'nst-est2019-01.xlsx'
+    state_population = pd.read_excel(file_path, header=3)
+    state_population.rename(columns={'Unnamed: 0': 'State'}, inplace=True)
+    state_population = state_population.drop(state_population.columns[[1, 2]], axis=1)
+    state_population['State'] = state_population['State'].str.strip('.')
+    state_population= state_population[state_population['State'].isin(state_climate['State'].values)].reset_index(drop=True)
+
+    return state_population
+
+def store_data(state_climate, state_population):
+    current_directory = os.getcwd()
+    data_folder_path = os.path.join(os.path.abspath(os.path.join(current_directory, os.pardir)), 'data')
+    if not os.path.exists(data_folder_path):
+        os.makedirs(data_folder_path)
+    
+    db_path = os.path.join(data_folder_path, 'state_pop_climate.db')
+    engine = create_engine(f'sqlite:///{db_path}')
+    state_climate.to_sql(name='state_climate', con=engine, index=False, if_exists='replace')
+    state_population.to_sql(name='state_population', con=engine, index=False, if_exists='replace')
+
 def main():
-    test = Pipeline()
-    test.creating_SQL()
+    sc = st_climate()
+    sp = st_pop(sc)
+    store_data(sc,sp)
 
 if __name__ == "__main__":
     main()
