@@ -46,7 +46,7 @@ def store_data(df,table_name):
     if not os.path.exists(data_folder_path):
         os.makedirs(data_folder_path)
     
-    db_path = os.path.join(data_folder_path, 'pop_climate.db')
+    db_path = os.path.join(data_folder_path, 'pop_climate.sqlite')
     engine = create_engine(f'sqlite:///{db_path}')
     df.to_sql(name=table_name, con=engine, index=False, if_exists='replace')
 
