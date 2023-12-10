@@ -1,0 +1,80 @@
+pipeline vehicle_pipeline
+{
+
+    get_data_http
+    ->text_to_file
+	->line_range_select
+    ->csv_decoder
+    ->table_decoder
+    ->vehicle_loader;
+
+
+	block get_data_http oftype HttpExtractor 
+    {
+		url: "https://www-genesis.destatis.de/genesis/downloads/00/tables/46251-0021_00.csv";
+	}
+
+	block text_to_file oftype TextFileInterpreter 
+    {
+		encoding: "latin2";
+	}
+
+	block line_range_select oftype TextRangeSelector 
+	{
+		lineFrom: 7; 
+		lineTo: 483;
+	}
+
+	block csv_decoder oftype CSVInterpreter 
+    {
+		delimiter: ';';
+	}
+
+	valuetype change_c oftype text
+	{
+		constraints: [change_c_char];
+	}
+	
+	constraint change_c_char oftype LengthConstraint
+	{
+		minLength: 0; 
+		maxLength: 5;
+	}
+
+	valuetype positive_val oftype integer
+	{
+		constraints: [positive_int];
+	}
+
+	constraint positive_int oftype RangeConstraint
+	{
+		lowerBound: 0;
+		lowerBoundInclusive: false;
+	}
+
+	block table_decoder oftype TableInterpreter 
+	{
+		header: false;
+		columns: [
+			"date" oftype text,
+			"CIN" oftype change_c,
+			"name" oftype text,
+			"petrol" oftype positive_val,
+			"diesel" oftype positive_val,
+			"gas" oftype positive_val,
+			"electro" oftype positive_val,
+			"hybrid" oftype positive_val,
+			"plugInHybrid" oftype positive_val,
+			"others" oftype positive_val
+		];
+	}
+
+	block vehicle_loader oftype SQLiteLoader 
+    {
+		table: "cars";
+		file: "./cars.sqlite";
+	}
+
+
+
+}
