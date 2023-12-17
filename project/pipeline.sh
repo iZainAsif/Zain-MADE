@@ -1,7 +1,7 @@
-#!/bin/bash
-
-cd "$(dirname "$0")"
-pip install opendatasets
 pip install pandas
-
-python3 pipeline.py
+pip install sqlalchemy
+pip install requests
+pip install os
+pip install unittest
+pip install openpyxl
+python3 project/pipeline.py
