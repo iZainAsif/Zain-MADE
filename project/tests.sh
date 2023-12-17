@@ -1,1 +1,1 @@
-python3 test_datapipeline.py
+python3 project/test_datapipeline.py
