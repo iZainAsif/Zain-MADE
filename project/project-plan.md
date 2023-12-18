@@ -1,7 +1,7 @@
 # Project Plan
 
 ## Title
-Climate Change Analysis in Top US States 
+Climate Change Analysis in US States 
 
 ## Main Question
 
