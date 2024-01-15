@@ -35,5 +35,5 @@ sqlTypes = {"Geraet": "BIGINT", "Hersteller": "TEXT", "Model": "TEXT",
                 "Monat": "TEXT", "Temperatur": "FLOAT", "Batterietemperatur": "FLOAT","Geraet aktiv": "TEXT"}
 
 conn = sqlite3.connect("temperatures.sqlite")
-df.to_sql("temperatures", conn, index=False, if_exists="replace", dtype=sqlTypes, index = False)
+df.to_sql("temperatures", conn, index=False, if_exists="replace", dtype=sqlTypes)
 conn.close()
