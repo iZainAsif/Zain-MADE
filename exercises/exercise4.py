@@ -14,7 +14,7 @@ with zipfile.ZipFile(file, 'r') as zip_ref:
     zip_ref.extractall(folder)
 
 data = os.path.join(folder, "data.csv")
-df = pd.read_csv(data)
+
 
 df = pd.read_csv(data,sep=";",decimal=",",index_col=False,
                  usecols=["Geraet", "Hersteller", "Model",
