@@ -31,9 +31,12 @@ df = df[df["Geraet"] > 0]
 df = df[(df["Monat"] >= 1) & (df["Monat"] <= 12)]
 df = df[(df["Geraet aktiv"] == 'Ja') | (df["Geraet aktiv"] == 'Nein')]
 
-conn = sqlite3.connect("temperatures.sqlite")
+db_path = "temperatures.sqlite"
+table = "temperatures"
+conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
-create_table_query = f"""
+
+query= f"""
     CREATE TABLE IF NOT EXISTS temperatures (
     Geraet BIGINT,
     Hersteller TEXT,
@@ -42,7 +45,8 @@ create_table_query = f"""
     Temperatur FLOAT,
     Batterietemperatur FLOAT,
     Geraet_aktiv TEXT)"""
-cursor.execute(create_table_query)
-df.to_sql('temperatures', conn, if_exists='replace', index=False)
+cursor.execute(query)
+
+df.to_sql(table, conn, if_exists='replace', index=False)
 conn.commit()
 conn.close()
