@@ -32,7 +32,7 @@ df = df[(df["Monat"] >= 1) & (df["Monat"] <= 12)]
 df = df[(df["Geraet aktiv"] == 'Ja') | (df["Geraet aktiv"] == 'Nein')]
 
 sqlTypes = {"Geraet": "BIGINT", "Hersteller": "TEXT", "Model": "TEXT",
-                "Monat": "TEXT", "Temperatur": "FLOAT", "Batterietemperatur": "FLOAT"}
+                "Monat": "TEXT", "Temperatur": "FLOAT", "Batterietemperatur": "FLOAT","Geraet_aktiv": "TEXT"}
 
 conn = sqlite3.connect("temperatures.sqlite")
 df.to_sql("temperatures", conn, index=False, if_exists="replace", dtype=sqlTypes)
