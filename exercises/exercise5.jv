@@ -27,6 +27,13 @@ valuetype Coordinate oftype decimal
 
 pipeline PublicTransport 
 {
+ 	GTFSDownloader
+        -> ZipFileProcessor
+        -> StopsTxtSelector
+        -> TextDataInterpreter
+        -> CSVDataParser
+        -> StopsDataMapping
+        -> SQLiteImport;
 
     block GTFSDownloader oftype HttpExtractor 
     {
