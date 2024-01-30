@@ -1,6 +1,3 @@
-/* Muhammad Zain Asif */
-
-
 constraint Zone_2001 oftype RangeConstraint 
 {
     lowerBound: 2001;
