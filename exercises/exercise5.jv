@@ -1,0 +1,70 @@
+/* Muhammad Zain Asif */
+
+
+constraint Zone_2001 oftype RangeConstraint 
+{
+    lowerBound: 2001;
+    upperBound: 2001;    
+    lowerBoundInclusive: true;
+    upperBoundInclusive: true;
+}
+
+constraint LLRange oftype RangeConstraint 
+{
+    lowerBound: -90;
+    upperBound: 90;
+    lowerBoundInclusive: true;
+    upperBoundInclusive: true;
+}
+
+valuetype Zone oftype integer 
+{
+    constraints: [Zone_2001];
+}
+
+valuetype Coordinate oftype decimal 
+{
+    constraints: [LLRange];
+}
+
+
+pipeline PublicTransport 
+{
+
+    block GTFSDownloader oftype HttpExtractor 
+    {
+        url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
+    }
+
+    block ZipFileProcessor oftype ArchiveInterpreter 
+    {
+        archiveType: "zip";
+    }
+
+    block StopsTxtSelector oftype FilePicker 
+    {
+        path: "/stops.txt";
+    }
+
+    block TextDataInterpreter oftype TextFileInterpreter 
+    {
+    }
+
+    block CSVDataParser oftype CSVInterpreter  
+    {
+        enclosing: '"';
+        enclosingEscape: '"';
+    }
+
+    block StopsDataMapping oftype TableInterpreter 
+    {
+        header: true;
+        columns: ["stop_id" oftype integer,"stop_name" oftype text,"stop_lat" oftype Coordinate,"stop_lon" oftype Coordinate,"zone_id" oftype Zone];
+    }
+
+    block SQLiteImport oftype SQLiteLoader {
+        table: "stops";
+        file: "./gtfs.sqlite";
+    }
+
+}
